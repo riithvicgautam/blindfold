@@ -6,13 +6,13 @@ import { chooseMove, type Difficulty } from "@/lib/engine";
 export const Route = createFileRoute("/play")({
   head: () => ({
     meta: [
-      { title: "Play — Blindfold Chess" },
+      { title: "Play — Blindfold" },
       {
         name: "description",
         content:
           "Play a full game of chess with no board. Moves appear as messages and you reply in algebraic notation.",
       },
-      { property: "og:title", content: "Play Blindfold Chess" },
+      { property: "og:title", content: "Play Blindfold" },
       {
         property: "og:description",
         content: "A boardless game of chess, played entirely in your head.",
@@ -158,7 +158,7 @@ function PlayPage() {
     <div className="flex h-screen flex-col bg-background">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-5">
         <Link to="/" className="text-sm font-semibold tracking-tight">
-          ♞ Blindfold Chess
+          ♞ Blindfold
         </Link>
         <span className="hidden text-xs text-muted-foreground sm:block">
           No board is shown. Ever.

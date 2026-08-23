@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — Blindfold Chess" },
+      { title: "How it works — Blindfold" },
       {
         name: "description",
         content:
           "Learn algebraic notation, how blindfold games are played as a conversation, and how to build board visualization step by step.",
       },
-      { property: "og:title", content: "How Blindfold Chess works" },
+      { property: "og:title", content: "How Blindfold works" },
       {
         property: "og:description",
         content: "Notation, conversation-style play, and how to train visualization.",
@@ -53,7 +53,7 @@ function HowItWorks() {
     <main className="min-h-screen">
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
         <Link to="/" className="text-sm font-semibold tracking-tight">
-          ♞ Blindfold Chess
+          ♞ Blindfold
         </Link>
         <Link
           to="/play"
