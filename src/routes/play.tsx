@@ -26,6 +26,8 @@ type Msg =
   | { id: number; kind: "move"; side: "w" | "b"; san: string; number: number }
   | { id: number; kind: "system"; text: string };
 
+type NewMsg = Msg extends infer M ? Omit<M, "id"> : never;
+
 const DIFFICULTIES: { id: Difficulty; label: string; sub: string }[] = [
   { id: "casual", label: "Casual", sub: "Forgiving" },
   { id: "club", label: "Club", sub: "Balanced" },
@@ -60,7 +62,7 @@ function PlayPage() {
 
   const over = useMemo(() => new Chess(fen).isGameOver(), [fen]);
 
-  const push = useCallback((m: Omit<Msg, "id">) => {
+  const push = useCallback((m: NewMsg) => {
     setMessages((prev) => [...prev, { ...m, id: idRef.current++ } as Msg]);
   }, []);
 
