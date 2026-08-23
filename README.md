@@ -1,6 +1,6 @@
-# Mind's Eye Chess
+# Blindfold
 
-Design a premium modern web application for a project called "Blindfold Chess".
+Design a premium modern web application for a project called "Blindfold".
 
 The concept is that users play chess WITHOUT ever seeing the chessboard. The entire experience relies on imagination.
 
