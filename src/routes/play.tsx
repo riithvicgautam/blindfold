@@ -26,7 +26,9 @@ type Msg =
   | { id: number; kind: "move"; side: "w" | "b"; san: string; number: number }
   | { id: number; kind: "system"; text: string };
 
-type NewMsg = Msg extends infer M ? Omit<M, "id"> : never;
+type NewMsg =
+  | { kind: "move"; side: "w" | "b"; san: string; number: number }
+  | { kind: "system"; text: string };
 
 const DIFFICULTIES: { id: Difficulty; label: string; sub: string }[] = [
   { id: "casual", label: "Casual", sub: "Forgiving" },
