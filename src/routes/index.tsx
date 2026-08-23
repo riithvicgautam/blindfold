@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Blindfold Chess — Play chess without ever seeing the board" },
+      { title: "Blindfold — Play chess without ever seeing the board" },
       {
         name: "description",
         content:
           "A calm, minimal way to train visualization. Play full games of chess in your head — moves arrive as messages, you reply in notation.",
       },
-      { property: "og:title", content: "Blindfold Chess" },
+      { property: "og:title", content: "Blindfold" },
       {
         property: "og:description",
         content: "Can you play chess without ever seeing the board?",
@@ -47,7 +47,7 @@ function Landing() {
           <span className="grid size-7 place-items-center rounded-lg bg-secondary text-[13px] font-semibold text-primary">
             ♞
           </span>
-          <span className="text-sm font-semibold tracking-tight">Blindfold Chess</span>
+          <span className="text-sm font-semibold tracking-tight">Blindfold</span>
         </div>
         <nav className="flex items-center gap-1 text-sm text-muted-foreground">
           <Link
@@ -76,7 +76,7 @@ function Landing() {
         </h1>
 
         <p className="animate-rise mx-auto mt-6 max-w-xl text-balance text-lg leading-relaxed text-muted-foreground [animation-delay:80ms]">
-          Blindfold Chess removes the one thing every player leans on. What is left is pure
+          Blindfold removes the one thing every player leans on. What is left is pure
           imagination — a full game, held entirely in your head.
         </p>
 
@@ -110,7 +110,7 @@ function Landing() {
 
       <footer className="relative border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-8 text-xs text-muted-foreground">
-          Blindfold Chess — train the board you cannot see.
+          Blindfold — train the board you cannot see.
         </div>
       </footer>
     </main>
