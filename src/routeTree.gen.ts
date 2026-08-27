@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
 
@@ -36,6 +37,11 @@ const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
   path: '/api/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
   id: '/api/auth/me',
   path: '/api/auth/me',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/play': typeof PlayRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/play': typeof PlayRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/play': typeof PlayRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/play'
     | '/api/auth/login'
+    | '/api/auth/logout'
     | '/api/auth/me'
     | '/api/auth/register'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/play'
     | '/api/auth/login'
+    | '/api/auth/logout'
     | '/api/auth/me'
     | '/api/auth/register'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/play'
     | '/api/auth/login'
+    | '/api/auth/logout'
     | '/api/auth/me'
     | '/api/auth/register'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PlayRoute: typeof PlayRoute
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/me': {
       id: '/api/auth/me'
       path: '/api/auth/me'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PlayRoute: PlayRoute,
   ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiAuthRegisterRoute: ApiAuthRegisterRoute,
 }
