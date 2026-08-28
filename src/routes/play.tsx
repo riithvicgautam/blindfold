@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { AccountMenu } from "@/components/auth/AccountMenu";
 import { Chess } from "chess.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { chooseMove, type Difficulty } from "@/lib/engine";
@@ -160,9 +162,12 @@ function PlayPage() {
         <Link to="/" className="text-sm font-semibold tracking-tight">
           ♞ Blindfold
         </Link>
-        <span className="hidden text-xs text-muted-foreground sm:block">
-          No board is shown. Ever.
-        </span>
+        <div className="flex items-center gap-4">
+          <span className="hidden text-xs text-muted-foreground sm:block">
+            No board is shown. Ever.
+          </span>
+          <AccountMenu />
+        </div>
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_280px]">

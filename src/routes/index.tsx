@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { AccountMenu } from "@/components/auth/AccountMenu";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -62,7 +64,11 @@ function Landing() {
           >
             Play
           </Link>
+          <span className="ml-1">
+            <AccountMenu />
+          </span>
         </nav>
+
       </header>
 
       <section className="relative mx-auto max-w-3xl px-6 pt-24 pb-28 text-center">
