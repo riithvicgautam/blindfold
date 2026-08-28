@@ -16,7 +16,7 @@ export function AccountMenu() {
     return (
       <Link
         to="/auth"
-        search={{ redirect: undefined }}
+        search={{}}
         className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-secondary"
       >
         Sign in
