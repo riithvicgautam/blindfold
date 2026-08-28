@@ -13,7 +13,7 @@ export const usersRepository = {
       .select()
       .from(users)
       .where(sql`lower(${users.email}) = ${email.toLowerCase()}`)
-      .limit(1);
+      .limit(sql.raw("1"));
     return rows[0] ?? null;
   },
 
@@ -23,7 +23,7 @@ export const usersRepository = {
       .select()
       .from(users)
       .where(sql`lower(${users.username}) = ${username.toLowerCase()}`)
-      .limit(1);
+      .limit(sql.raw("1"));
     return rows[0] ?? null;
   },
 
@@ -33,7 +33,7 @@ export const usersRepository = {
       .select()
       .from(users)
       .where(sql`${users.id}::text = ${id}`)
-      .limit(1);
+      .limit(sql.raw("1"));
     return rows[0] ?? null;
   },
 
