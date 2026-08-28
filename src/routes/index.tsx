@@ -62,7 +62,11 @@ function Landing() {
           >
             Play
           </Link>
+          <span className="ml-1">
+            <AccountMenu />
+          </span>
         </nav>
+
       </header>
 
       <section className="relative mx-auto max-w-3xl px-6 pt-24 pb-28 text-center">
