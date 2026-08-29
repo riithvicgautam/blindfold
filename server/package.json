@@ -1,0 +1,32 @@
+{
+  "name": "@blindfold/server",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "prisma generate && tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^10.0.2",
+    "@fastify/jwt": "^9.0.3",
+    "@prisma/client": "^6.3.1",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "prisma": "^6.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
