@@ -43,10 +43,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      drizzle_exec: {
-        Args: { params?: string[]; query: string }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
