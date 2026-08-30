@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.drizzle_exec(text, text[]);

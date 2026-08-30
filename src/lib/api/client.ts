@@ -44,7 +44,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     method,
     // Session persistence relies on the backend's httpOnly cookie.
     credentials: "include",
-    signal,
+    signal: signal ?? null,
     headers: {
       Accept: "application/json",
       ...(body !== undefined ? { "content-type": "application/json" } : {}),

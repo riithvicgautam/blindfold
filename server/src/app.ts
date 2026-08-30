@@ -18,7 +18,6 @@ export async function buildApp(): Promise<FastifyInstance> {
         : { transport: { target: "pino-pretty", options: { colorize: true } } }),
     },
     trustProxy: true,
-    disableRequestLogging: false,
   });
 
   registerErrorHandler(app);

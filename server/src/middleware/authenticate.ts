@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+import type { SessionClaims } from "../types/index.js";
 import { unauthorized } from "../utils/errors.js";
 
 /**
@@ -9,7 +10,7 @@ import { unauthorized } from "../utils/errors.js";
  */
 export async function authenticate(request: FastifyRequest, _reply: FastifyReply) {
   try {
-    const claims = await request.jwtVerify();
+    const claims = (await request.jwtVerify()) as SessionClaims;
     request.currentUser = claims;
   } catch {
     throw unauthorized("Your session has expired. Please sign in again.");
@@ -19,7 +20,7 @@ export async function authenticate(request: FastifyRequest, _reply: FastifyReply
 /** Non-blocking variant: attaches user context when present, never rejects. */
 export async function optionalAuthenticate(request: FastifyRequest, _reply: FastifyReply) {
   try {
-    request.currentUser = await request.jwtVerify();
+    request.currentUser = (await request.jwtVerify()) as SessionClaims;
   } catch {
     request.currentUser = undefined;
   }
