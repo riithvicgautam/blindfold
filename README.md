@@ -92,13 +92,41 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.
 - **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
+## Project structure
+
+```
+blindfold/
+├── src/      → client — TanStack Start (React 19 + Vite + shadcn/ui)
+└── server/   → API — Fastify + TypeScript + Prisma + PostgreSQL
+```
+
+The frontend lives at the repository root (the Lovable build pipeline requires
+`vite.config.ts` and `package.json` there); it is the client package and contains
+no server code. The Fastify API is fully standalone under `server/` and the two
+talk only over REST.
+
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
-npm i
-npm run dev
+
+npm i                       # frontend deps
+npm run install:server      # backend deps
+
+cp server/.env.example server/.env   # set DATABASE_URL + JWT_SECRET
+npm --prefix server run prisma:migrate
+
+npm run dev                 # frontend + backend together
+npm run dev:client          # frontend only  → http://localhost:8080
+npm run dev:server          # backend only   → http://localhost:4000
 ```
+
+Point the frontend at the API with `VITE_API_URL` (defaults to
+`http://localhost:4000/api`). All frontend requests go through the centralized
+client in `src/lib/api/client.ts`.
+
+See [`server/README.md`](./server/README.md) for the backend architecture and API.
+
