@@ -30,6 +30,24 @@ export const userRepository = {
       },
     });
   },
+
+  update(
+    id: string,
+    data: Partial<{
+      username: string;
+      email: string;
+      emailVerified: boolean;
+      displayName: string | null;
+      avatarUrl: string | null;
+      passwordHash: string;
+    }>,
+  ): Promise<User> {
+    return prisma.user.update({ where: { id }, data });
+  },
+
+  async delete(id: string): Promise<void> {
+    await prisma.user.delete({ where: { id } });
+  },
 };
 
 export type UserRepository = typeof userRepository;
