@@ -8,11 +8,70 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid()) @db.Uuid
-  username     String   @unique
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id            String   @id @default(uuid()) @db.Uuid
+  username      String   @unique
+  email         String   @unique
+  emailVerified Boolean  @default(false) @map("email_verified")
+  displayName   String?  @map("display_name")
+  avatarUrl     String?  @map("avatar_url")
+  passwordHash  String   @map("password_hash")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  passwordResetTokens PasswordResetToken[]
+  studySessions       StudySession[]
+  reviewEvents        ReviewEvent[]
 
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+/// Analytics foundation — populated later by gameplay + the AI coach.
+model StudySession {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  startedAt   DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  endedAt     DateTime? @map("ended_at") @db.Timestamptz(6)
+  durationSec Int       @default(0) @map("duration_sec")
+  movesPlayed Int       @default(0) @map("moves_played")
+  hintsUsed   Int       @default(0) @map("hints_used")
+  accuracy    Float?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewEvents ReviewEvent[]
+
+  @@index([userId, startedAt])
+  @@map("study_sessions")
+}
+
+/// A single recall / review attempt inside a study session.
+model ReviewEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  sessionId     String?  @map("session_id") @db.Uuid
+  kind          String
+  correct       Boolean  @default(false)
+  hintUsed      Boolean  @default(false) @map("hint_used")
+  responseMs    Int      @default(0) @map("response_ms")
+  payload       Json?
+  occurredAt    DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@map("review_events")
 }
