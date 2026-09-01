@@ -1,19 +1,9 @@
-import type { User } from "@prisma/client";
-
 import { userRepository } from "../repositories/user.repository.js";
 import type { LoginInput, RegisterInput } from "../schemas/auth.schema.js";
 import type { PublicUser, SessionClaims } from "../types/index.js";
 import { conflict, invalidCredentials, unauthorized } from "../utils/errors.js";
+import { toPublicUser } from "../utils/mappers.js";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "../utils/password.js";
-
-function toPublicUser(user: User): PublicUser {
-  return {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    createdAt: user.createdAt.toISOString(),
-  };
-}
 
 function toClaims(user: PublicUser): SessionClaims {
   return { sub: user.id, username: user.username, email: user.email };

@@ -13,4 +13,10 @@ export const authApi = {
     apiClient.get<{ user: PublicUser }>("/auth/me", signal ? { signal } : {}),
 
   logout: () => apiClient.post<{ ok: true }>("/auth/logout"),
+
+  forgotPassword: (body: { email: string }) =>
+    apiClient.post<{ ok: true; message: string }>("/auth/forgot-password", body),
+
+  resetPassword: (body: { token: string; password: string }) =>
+    apiClient.post<{ ok: true }>("/auth/reset-password", body),
 };
