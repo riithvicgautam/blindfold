@@ -14,6 +14,8 @@ type AuthContextValue = {
   login: (input: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  /** Replace the cached user after a profile mutation. */
+  setUser: (user: PublicUser | null) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -47,6 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       status,
       refresh,
+      setUser(next) {
+        setUser(next);
+        setStatus(next ? "authenticated" : "anonymous");
+      },
       async register(input) {
         const { user: created } = await authApi.register(input);
         setUser(created);
