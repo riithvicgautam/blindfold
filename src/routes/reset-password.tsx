@@ -81,7 +81,7 @@ function ResetPasswordPage() {
     setFormError(null);
     setSubmitting(true);
     try {
-      await authApi.resetPassword({ token, password: parsed.data.password });
+      await authApi.resetPassword({ token: resetToken, password: parsed.data.password });
       setDone(true);
       setTimeout(() => void navigate({ to: "/auth", search: {}, replace: true }), 2200);
     } catch (error) {
