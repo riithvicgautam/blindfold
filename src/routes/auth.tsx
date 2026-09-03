@@ -47,7 +47,7 @@ function AuthPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  const destination = redirect ?? "/play";
+  const destination = redirect ?? "/dashboard";
 
   useEffect(() => {
     if (status === "authenticated" && user) {
