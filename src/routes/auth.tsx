@@ -150,6 +150,17 @@ function AuthPage() {
             />
           </Field>
 
+          {mode === "login" && (
+            <p className="mt-3 text-right text-sm">
+              <Link
+                to="/forgot-password"
+                className="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+              >
+                Forgot your password?
+              </Link>
+            </p>
+          )}
+
           {formError && (
             <p className="mt-4 rounded-lg border border-border bg-background px-3 py-2 text-sm text-destructive">
               {formError}
