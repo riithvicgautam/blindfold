@@ -62,6 +62,8 @@ function ResetPasswordPage() {
     );
   }
 
+  const resetToken: string = token;
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     const parsed = resetPasswordSchema.safeParse({ password, confirmPassword });
