@@ -64,7 +64,7 @@ function ResetPasswordPage() {
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const parsed = resetPasswordSchema.safeParse({ token, password, confirmPassword });
+    const parsed = resetPasswordSchema.safeParse({ password, confirmPassword });
     if (!parsed.success) {
       const next: Record<string, string[]> = {};
       for (const issue of parsed.error.issues) {
@@ -79,7 +79,7 @@ function ResetPasswordPage() {
     setFormError(null);
     setSubmitting(true);
     try {
-      await authApi.resetPassword({ token: parsed.data.token, password: parsed.data.password });
+      await authApi.resetPassword({ token, password: parsed.data.password });
       setDone(true);
       setTimeout(() => void navigate({ to: "/auth", search: {}, replace: true }), 2200);
     } catch (error) {
