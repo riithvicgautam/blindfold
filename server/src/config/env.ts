@@ -21,6 +21,18 @@ const envSchema = z.object({
     .default("false")
     .transform((v) => v === "true"),
 
+  // AI coach (optional — falls back to deterministic templates when unset)
+  AI_API_KEY: z.string().optional(),
+  AI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
+  AI_MODEL: z.string().default("gpt-4o-mini"),
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(4000),
+  // Score multiplier per hints used: index 0 = no hints, last = cap
+  HINT_PENALTIES: z
+    .string()
+    .default("1,0.8,0.6,0.4,0.2")
+    .transform((v) => v.split(",").map((n) => Number(n.trim())))
+    .refine((a) => a.length > 0 && a.every((n) => n >= 0 && n <= 1), "HINT_PENALTIES must be 0..1 values"),
+
   CORS_ORIGINS: z
     .string()
     .default("http://localhost:8080")

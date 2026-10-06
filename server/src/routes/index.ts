@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 
 import { analyticsRoutes } from "./analytics.routes.js";
 import { authRoutes } from "./auth.routes.js";
+import { coachRoutes } from "./coach.routes.js";
 import { healthRoutes } from "./health.routes.js";
 import { userRoutes } from "./user.routes.js";
 
@@ -11,4 +12,5 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(userRoutes, { prefix: "/users" });
   await app.register(analyticsRoutes, { prefix: "/analytics" });
+  await app.register(coachRoutes, { prefix: "/coach" });
 }
