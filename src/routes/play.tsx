@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { AccountMenu } from "@/components/auth/AccountMenu";
+import { CoachPanel } from "@/components/play/CoachPanel";
 import { Chess } from "chess.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { chooseMove, type Difficulty } from "@/lib/engine";
@@ -170,7 +171,7 @@ function PlayPage() {
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_280px]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_320px]">
         {/* Left sidebar */}
         <aside className="hidden min-h-0 flex-col border-r border-border lg:flex">
           <div className="flex items-center justify-between px-5 py-4">
@@ -352,6 +353,8 @@ function PlayPage() {
               Move {Math.floor(history.length / 2) + 1}
             </p>
           </Field>
+
+          <CoachPanel fen={fen} disabled={over} />
         </aside>
       </div>
     </div>
