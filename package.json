@@ -11,9 +11,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "dev:client": "vite dev",
-    "dev:server": "npm --prefix server run dev",
-    "build:server": "npm --prefix server run build",
-    "install:server": "npm --prefix server install"
+    "dev:server": "npm --prefix backend run dev",
+        "install:server": "npm --prefix backend install",
+    "test:server": "npm --prefix backend test"
   },
   "overrides": {
     "rolldown": "1.2.1"
