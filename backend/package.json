@@ -7,7 +7,7 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "db:migrate": "node db/migrate.js",
-    "test": "node --test tests/"
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
