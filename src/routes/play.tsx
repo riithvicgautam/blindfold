@@ -58,6 +58,7 @@ function PlayPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const [gameKey, setGameKey] = useState(0);
+  const [resigned, setResigned] = useState(false);
   const { user } = useAuth();
   // Study session tracking (signed-in players only).
   const sessionRef = useRef<{ id: string | null; ended: boolean }>({ id: null, ended: false });
@@ -110,7 +111,6 @@ function PlayPage() {
     return "In progress";
   }, [fen, resigned]);
 
-  const [resigned, setResigned] = useState(false);
   const over = useMemo(() => resigned || new Chess(fen).isGameOver(), [fen, resigned]);
 
   const push = useCallback((m: NewMsg) => {
