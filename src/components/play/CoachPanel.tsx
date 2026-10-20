@@ -2,37 +2,48 @@ import { useEffect, useRef, useState } from "react";
 
 import { coachApi } from "@/lib/api/coach.service";
 
-type Line = { id: number; who: "you" | "coach"; text: string; level?: number; maxLevel?: number };
+type Line = {
+  id: number;
+  who: "you" | "coach";
+  text: string;
+  level?: number;
+  maxLevel?: number;
+  penalty?: number;
+  options?: string[];
+};
 
-const SUGGESTIONS = ["Where is my knight?", "What's around my king?", "Where is the black queen?"];
+const SUGGESTIONS = ["Where is my knight?", "Is my king in check?", "Where is my opponent's queen?"];
 
 /**
  * Visualization coach. Hints are generated server-side from the current FEN;
  * any move resets the escalation chain so a stale hint is never reused.
+ * Remount (change `key`) to start a fresh game.
  */
-export function CoachPanel({ fen, disabled }: { fen: string; disabled?: boolean }) {
+export function CoachPanel({
+  fen,
+  disabled,
+  sessionId,
+  onScoring,
+}: {
+  fen: string;
+  disabled?: boolean;
+  sessionId?: string | null;
+  onScoring?: (s: { hintsUsed: number; score: number }) => void;
+}) {
   const [lines, setLines] = useState<Line[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
-  const [multiplier, setMultiplier] = useState(1);
+  const [score, setScore] = useState(100);
   const [previous, setPrevious] = useState<{ topicKey: string; level: number } | undefined>();
   const idRef = useRef(0);
   const feedRef = useRef<HTMLDivElement>(null);
   const positionSince = useRef(Date.now());
-  const startFen = useRef(fen);
 
   // New position → invalidate the current hint chain.
   useEffect(() => {
     setPrevious(undefined);
     positionSince.current = Date.now();
-    // A brand-new game resets the hint counter too.
-    if (fen.startsWith("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w") && fen !== startFen.current) {
-      setHintsUsed(0);
-      setMultiplier(1);
-      setLines([]);
-    }
-    startFen.current = fen;
   }, [fen]);
 
   useEffect(() => {
@@ -52,14 +63,25 @@ export function CoachPanel({ fen, disabled }: { fen: string; disabled?: boolean 
         fen,
         question: q,
         hintsUsed,
+        score,
+        ...(sessionId ? { sessionId } : {}),
         responseMs: Date.now() - positionSince.current,
         ...(previous ? { previous } : {}),
       });
       setHintsUsed(reply.hintsUsed);
-      setMultiplier(reply.scoreMultiplier);
+      setScore(reply.score);
+      onScoring?.({ hintsUsed: reply.hintsUsed, score: reply.score });
       if (reply.kind === "hint") {
         setPrevious({ topicKey: reply.topicKey, level: reply.level });
-        add({ who: "coach", text: reply.text, level: reply.level, maxLevel: reply.maxLevel });
+        add({
+          who: "coach",
+          text: reply.text,
+          level: reply.level,
+          maxLevel: reply.maxLevel,
+          penalty: reply.penalty,
+        });
+      } else if (reply.kind === "clarify") {
+        add({ who: "coach", text: reply.text, options: reply.options });
       } else {
         add({ who: "coach", text: reply.text });
       }
@@ -79,7 +101,7 @@ export function CoachPanel({ fen, disabled }: { fen: string; disabled?: boolean 
           Visualization coach
         </h3>
         <span className="font-mono text-[11px] text-muted-foreground">
-          {hintsUsed} hint{hintsUsed === 1 ? "" : "s"} · {Math.round(multiplier * 100)}%
+          {hintsUsed} hint{hintsUsed === 1 ? "" : "s"} · score {score}
         </span>
       </div>
 
@@ -121,6 +143,23 @@ export function CoachPanel({ fen, disabled }: { fen: string; disabled?: boolean 
                   </div>
                 )}
                 <p className="text-sm">{l.text}</p>
+                {l.penalty ? (
+                  <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">−{l.penalty} points</p>
+                ) : null}
+                {l.options && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {l.options.map((o) => (
+                      <button
+                        key={o}
+                        onClick={() => void ask(o)}
+                        disabled={disabled || busy}
+                        className="rounded-full border border-border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-40"
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ),
           )
@@ -160,7 +199,7 @@ export function CoachPanel({ fen, disabled }: { fen: string; disabled?: boolean 
             Stronger hint
           </button>
         </div>
-        <p className="text-[11px] text-muted-foreground">Each hint lowers this game's score.</p>
+        <p className="text-[11px] text-muted-foreground">Broad clue −2 · rank or file −5 · exact square −10.</p>
       </form>
     </div>
   );
