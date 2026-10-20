@@ -96,37 +96,47 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 
 ```
 blindfold/
-├── src/      → client — TanStack Start (React 19 + Vite + shadcn/ui)
-└── server/   → API — Fastify + TypeScript + Prisma + PostgreSQL
+├── src/       → React frontend (TanStack Start + Vite). API helpers + engine in plain JS.
+└── backend/   → Express + plain JavaScript + PostgreSQL (pg, parameterized SQL)
+    ├── server.js / app.js   start-up, CORS, cookies, routes, error handler
+    ├── config.js            every environment variable
+    ├── db/                  pg pool, schema.sql, migrate.js
+    ├── middleware/          auth.js (JWT), errors.js
+    ├── routes/              auth, users, coach, sessions, analytics
+    ├── services/            hints.js, penalties.js, ai.js, users.js, validate.js
+    └── tests/               node:test suites
 ```
 
-The frontend lives at the repository root (the Lovable build pipeline requires
-`vite.config.ts` and `package.json` there); it is the client package and contains
-no server code. The Fastify API is fully standalone under `server/` and the two
-talk only over REST.
-
-## Development
-
-You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Setup and run
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-
-npm i                       # frontend deps
-npm run install:server      # backend deps
-
-cp server/.env.example server/.env   # set DATABASE_URL + JWT_SECRET
-npm --prefix server run prisma:migrate
-
-npm run dev                 # frontend + backend together
-npm run dev:client          # frontend only  → http://localhost:8080
-npm run dev:server          # backend only   → http://localhost:4000
+npm install                          # frontend
+npm run install:server               # backend
+cp backend/.env.example backend/.env # set DATABASE_URL and JWT_SECRET
+createdb blindfold
+npm --prefix backend run db:migrate  # applies backend/db/schema.sql
+npm run dev                          # frontend :8080 + backend :4000
 ```
 
-Point the frontend at the API with `VITE_API_URL` (defaults to
-`http://localhost:4000/api`). All frontend requests go through the centralized
-client in `src/lib/api/client.ts`.
+Required: `DATABASE_URL`, `JWT_SECRET` (mandatory in production). Optional: `PORT`,
+`CORS_ORIGINS`, `AI_PROVIDER` (`gemini` | `groq` | `none`), `GEMINI_API_KEY`, `GROQ_API_KEY`,
+model names, `AI_TIMEOUT_MS`. Frontend: `VITE_API_URL` (default `http://localhost:4000/api`).
 
-See [`server/README.md`](./server/README.md) for the backend architecture and API.
+Tests: `TEST_DATABASE_URL=postgres://... npm run test:server` (API suite skips without a DB).
 
+## Request flow
+
+React → `src/lib/api/client.js` (fetch, `credentials: "include"`) → Express route →
+`requireAuth` verifies the JWT cookie → parameterized `pg` query → JSON → React.
+
+## Coaching flow
+
+1. Play page sends the FEN + question to `POST /api/coach/hint`.
+2. `services/hints.js` loads the FEN in chess.js, finds the named piece (asks which one if several).
+3. Clue by level: side of board → rank → file → exact square.
+4. `services/penalties.js`: −2 broad, −5 rank/file, −10 exact, repeats free.
+5. `services/ai.js` optionally rewords via Gemini/Groq; replies adding any coordinate, timeouts and
+   errors fall back to the original clue. No key → original clue.
+6. Signed-in players' hints are saved in `review_events`, linked to the game's `study_sessions` row.
+
+The LLM never sees the board, never picks moves, and never calculates scores.

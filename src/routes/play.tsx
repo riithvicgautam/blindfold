@@ -4,7 +4,11 @@ import { AccountMenu } from "@/components/auth/AccountMenu";
 import { CoachPanel } from "@/components/play/CoachPanel";
 import { Chess } from "chess.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { chooseMove, type Difficulty } from "@/lib/engine";
+import { chooseMove } from "@/lib/engine";
+import { sessionsApi } from "@/lib/api/sessions.service";
+import { useAuth } from "@/lib/auth/session";
+
+type Difficulty = "casual" | "club" | "master";
 
 export const Route = createFileRoute("/play")({
   head: () => ({
@@ -53,19 +57,61 @@ function PlayPage() {
   const idRef = useRef(1);
   const inputRef = useRef<HTMLInputElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
+  const [gameKey, setGameKey] = useState(0);
+  const [resigned, setResigned] = useState(false);
+  const { user } = useAuth();
+  // Study session tracking (signed-in players only).
+  const sessionRef = useRef<{ id: string | null; ended: boolean }>({ id: null, ended: false });
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const statsRef = useRef({ attempts: 0, legal: 0, hintsUsed: 0 });
 
   const game = gameRef.current;
+
+  const endSession = useCallback(() => {
+    const s = sessionRef.current;
+    if (!s.id || s.ended) return;
+    s.ended = true;
+    const { attempts, legal, hintsUsed } = statsRef.current;
+    void sessionsApi
+      .end(s.id, {
+        movesPlayed: legal,
+        hintsUsed,
+        accuracy: attempts ? Math.round((legal / attempts) * 100) : null,
+      })
+      .catch(() => undefined);
+  }, []);
+
+  // Open a session for each new game when signed in.
+  useEffect(() => {
+    if (!user) return;
+    sessionRef.current = { id: null, ended: false };
+    statsRef.current = { attempts: 0, legal: 0, hintsUsed: 0 };
+    setSessionId(null);
+    let cancelled = false;
+    sessionsApi
+      .start()
+      .then(({ session }) => {
+        if (cancelled) return;
+        sessionRef.current.id = session.id;
+        setSessionId(session.id);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, gameKey]);
 
   const status = useMemo(() => {
     const g = new Chess(fen);
     if (g.isCheckmate()) return g.turn() === "w" ? "Black wins by checkmate" : "You win by checkmate";
     if (g.isStalemate()) return "Draw by stalemate";
     if (g.isDraw()) return "Draw";
+    if (resigned) return "You resigned — Black wins";
     if (g.isCheck()) return g.turn() === "w" ? "You are in check" : "Black is in check";
     return "In progress";
-  }, [fen]);
+  }, [fen, resigned]);
 
-  const over = useMemo(() => new Chess(fen).isGameOver(), [fen]);
+  const over = useMemo(() => resigned || new Chess(fen).isGameOver(), [fen, resigned]);
 
   const push = useCallback((m: NewMsg) => {
     setMessages((prev) => [...prev, { ...m, id: idRef.current++ } as Msg]);
@@ -76,25 +122,28 @@ function PlayPage() {
   }, [messages, thinking]);
 
   const reset = useCallback(() => {
+    endSession();
+    setGameKey((k) => k + 1);
     gameRef.current = new Chess();
     setFen(gameRef.current.fen());
     setHistory([]);
     setThinking(false);
     setError(null);
     setInput("");
+    setResigned(false);
     idRef.current = 1;
     setMessages([
       { id: 0, kind: "system", text: "New game. You are White — make your first move." },
     ]);
     inputRef.current?.focus();
-  }, []);
+  }, [endSession]);
 
   const resign = useCallback(() => {
     if (over) return;
     push({ kind: "system", text: "You resigned. Black wins." });
-    gameRef.current.load(gameRef.current.fen());
-    setFen(gameRef.current.fen());
-  }, [over, push]);
+    endSession();
+    setResigned(true);
+  }, [over, push, endSession]);
 
   const submit = useCallback(
     (raw: string) => {
@@ -107,11 +156,13 @@ function PlayPage() {
       } catch {
         played = null;
       }
+      statsRef.current.attempts++;
       if (!played) {
         setError(`"${value}" isn't a legal move here.`);
         return;
       }
 
+      statsRef.current.legal++;
       setError(null);
       setInput("");
       const num = Math.ceil(game.history().length / 2);
@@ -121,6 +172,7 @@ function PlayPage() {
 
       if (game.isGameOver()) {
         push({ kind: "system", text: describeEnd(game) });
+        endSession();
         return;
       }
 
@@ -138,12 +190,15 @@ function PlayPage() {
           push({ kind: "move", side: "b", san, number: Math.ceil(game.history().length / 2) });
           setHistory(game.history());
           setFen(game.fen());
-          if (game.isGameOver()) push({ kind: "system", text: describeEnd(game) });
+          if (game.isGameOver()) {
+            push({ kind: "system", text: describeEnd(game) });
+            endSession();
+          }
         },
         700 + Math.random() * 700,
       );
     },
-    [difficulty, game, over, push, thinking],
+    [difficulty, game, over, push, thinking, endSession],
   );
 
   const pairs = useMemo(() => {
@@ -354,7 +409,15 @@ function PlayPage() {
             </p>
           </Field>
 
-          <CoachPanel fen={fen} disabled={over} />
+          <CoachPanel
+            key={gameKey}
+            fen={fen}
+            disabled={over}
+            sessionId={sessionId}
+            onScoring={({ hintsUsed }) => {
+              statsRef.current.hintsUsed = hintsUsed;
+            }}
+          />
         </aside>
       </div>
     </div>

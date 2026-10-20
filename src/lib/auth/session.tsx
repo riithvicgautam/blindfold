@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
  * Session state for the app. The JWT itself lives in an httpOnly cookie set by
- * the Fastify backend, so it is never readable by scripts; this provider only
+ * the Express backend, so it is never readable by scripts; this provider only
  * mirrors the resolved user for React consumers.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
